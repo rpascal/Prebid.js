@@ -12,6 +12,7 @@ import { createHook } from 'src/hook';
 import { sessionLoader } from 'src/debugging';
 import includes from 'core-js/library/fn/array/includes';
 import { adunitCounter } from './adUnits';
+import { interceptedBidsBackHandler } from './cold-brew-code/validator';
 
 const $$PREBID_GLOBAL$$ = getGlobal();
 const CONSTANTS = require('./constants.json');
@@ -380,8 +381,8 @@ $$PREBID_GLOBAL$$.requestBids = createHook('asyncSeries', function ({ bidsBackHa
     }
     return;
   }
-
-  const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: bidsBackHandler, cbTimeout, labels});
+  const _interceptedBidsBackHandler = interceptedBidsBackHandler(bidsBackHandler);
+  const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: _interceptedBidsBackHandler, cbTimeout, labels});
   auction.callBids();
   return auction;
 });
